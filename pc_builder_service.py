@@ -18,7 +18,6 @@ from typing import Dict, Any, Optional
 import threading
 from signalwire_agents import AgentBase, AgentServer
 from signalwire_agents.core.function_result import SwaigFunctionResult
-from signalwire_agents.core.data_map import DataMap
 from signalwire_agents.core.logging_config import get_logger
 
 # Import the proper context manager
@@ -41,11 +40,14 @@ class TriageAgent(AgentBase):
             port=3001
         )
         
-        # Register tools after parent initialization
-        self.register_tools()
+        # Register static tools (save_customer_context)
+        self.register_static_tools()
         
-    def register_tools(self) -> None:
-        """Register triage agent tools"""
+        # Set up dynamic configuration for URL-dependent tools
+        self.set_dynamic_config_callback(self.configure_transfer_tools)
+        
+    def register_static_tools(self) -> None:
+        """Register tools that don't depend on URLs"""
         
         # Save customer context tool
         @self.tool("save_customer_context", description="Save customer information before transfer")
@@ -70,8 +72,23 @@ class TriageAgent(AgentBase):
                 return SwaigFunctionResult(f"I've saved your information, {customer_name}. Let me connect you with the right specialist.")
             else:
                 return SwaigFunctionResult("I'm having trouble saving your information. Let me transfer you anyway.")
+    
+    def configure_transfer_tools(self, query_params, body_params, headers, agent):
+        """
+        DYNAMIC CONFIGURATION - Called fresh for every request
         
-        # Create transfer tool using DataMap with swml_transfer (like the dual agent example)
+        This builds the DataMap with correct URLs after proxy detection is available.
+        
+        Args:
+            query_params: Query string parameters from the request
+            body_params: POST body parameters (empty for GET requests)
+            headers: HTTP headers from the request
+            agent: EphemeralAgentConfig object to configure
+        """
+        from signalwire_agents.core.data_map import DataMap
+        from signalwire_agents.core.function_result import SwaigFunctionResult
+        
+        # NOW we can build URLs with proper proxy detection
         sales_url = self.get_full_url(include_auth=True).rstrip('/') + "/sales"
         support_url = self.get_full_url(include_auth=True).rstrip('/') + "/support"
         
@@ -88,7 +105,7 @@ class TriageAgent(AgentBase):
                        SwaigFunctionResult("I can transfer you to either our sales or support specialist. Which would you prefer?"))
         )
         
-        # Register the transfer tool with the agent
+        # Register the transfer tool with the agent dynamically
         self.register_swaig_function(transfer_tool.to_swaig_function())
     
     def get_prompt(self):
@@ -364,11 +381,11 @@ if __name__ == "__main__":
     logger.info("=" * 60)
     
     logger.info("Features:")
-    logger.info("✓ Multi-agent architecture with context sharing")
-    logger.info("✓ Native vector search for knowledge bases")
-    logger.info("✓ Agent-to-agent transfers")
-    logger.info("✓ Customer context preservation")
-    logger.info("✓ Specialized expertise per agent")
+    logger.info("âœ“ Multi-agent architecture with context sharing")
+    logger.info("âœ“ Native vector search for knowledge bases")
+    logger.info("âœ“ Agent-to-agent transfers")
+    logger.info("âœ“ Customer context preservation")
+    logger.info("âœ“ Specialized expertise per agent")
     
     # Log context manager type
     logger.info("")
