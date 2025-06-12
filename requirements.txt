@@ -1,0 +1,16 @@
+# Core SignalWire Agents SDK
+signalwire-agents>=0.1.20
+
+# Search/RAG capabilities (optional but recommended)
+signalwire-agents[search]>=0.1.20
+
+# Web server
+uvicorn>=0.20.0
+fastapi>=0.100.0
+
+# For development and testing
+python-dotenv>=1.0.0
+
+# Optional: For enhanced search features
+# Uncomment if you want advanced NLP capabilities
+# signalwire-agents[search-nlp]>=0.1.20
