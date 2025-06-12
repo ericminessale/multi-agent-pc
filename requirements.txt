@@ -1,5 +1,7 @@
 # Core SignalWire Agents SDK
-signalwire-agents>=0.1.20
+git+https://github.com/briankwest/signalwire-agents.git
+requests>=2.32.0
+pydantic>=2.11.0
 
 # Search/RAG capabilities (optional but recommended)
 signalwire-agents[search]>=0.1.20
