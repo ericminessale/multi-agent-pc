@@ -12,7 +12,7 @@ Shared state manager that passes context from triage to the destination agent (b
 
 ## Setup Instructions
 
-1. run setup.py which installs dependencies and sets up a virtual environment
+1. run setup.py which sets up a virtual environment and installs dependencies
 
 2. start the script in the venv with run.bat or manually with:
 venv\Scripts\activate
