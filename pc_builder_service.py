@@ -36,6 +36,9 @@ class TriageAgent(AgentBase):
         # Configure prompt using POM
         self._configure_prompt()
         
+        # Configure language with professional receptionist voice
+        self.add_language("English", "en-US", "elevenlabs.rachel")
+        
         # Set up dynamic configuration for URL-dependent tools
         self.set_dynamic_config_callback(self.configure_transfer_tools)
     
@@ -97,7 +100,8 @@ class TriageAgent(AgentBase):
                 "Greet: 'Thank you for calling PC Builder Pro! I'm here to connect you with the right specialist. May I have your name?'",
                 "After getting their name: 'Hi [Name]! Are you looking to build or buy a new PC (Sales), or do you need help with an existing computer (Support)?'",
                 "Listen to their response and ask ONE clarifying question if needed",
-                "Once clear, use transfer_to_specialist with their choice"
+                "When you know which department they need, immediately call transfer_to_specialist WITHOUT saying you're transferring",
+                "The system will announce the transfer for you - do NOT say 'let me transfer you' or 'I'll connect you'"
             ]
         )
         
@@ -116,8 +120,9 @@ class TriageAgent(AgentBase):
             bullets=[
                 "Be brief - this is just routing, not solving their problem",
                 "Don't try to diagnose or recommend anything yourself",
-                "Once you know what they need, transfer immediately",
-                "DO NOT repeatedly say you're transferring - just do it once"
+                "When ready to transfer, just execute transfer_to_specialist - DO NOT announce it first",
+                "The function's message parameter will handle the transfer announcement",
+                "If they ask for something unclear, just ask: 'Would that be Sales for a new PC, or Support for help with an existing one?'"
             ]
         )
     
@@ -138,6 +143,9 @@ class SalesAgent(AgentBase):
         
         # Configure prompt using POM
         self._configure_prompt()
+        
+        # Configure language with enthusiastic male sales voice
+        self.add_language("English", "en-US", "elevenlabs.josh")
         
         # Add search capability for sales knowledge
         self.add_skill("native_vector_search", {
@@ -276,6 +284,9 @@ class SupportAgent(AgentBase):
         
         # Configure prompt using POM
         self._configure_prompt()
+        
+        # Configure language with empathetic female support voice
+        self.add_language("English", "en-US", "elevenlabs.sarah")
         
         # Add search capability for support knowledge
         self.add_skill("native_vector_search", {
